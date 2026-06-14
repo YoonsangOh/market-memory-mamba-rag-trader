@@ -1,0 +1,194 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Market-Memory Mamba-RAG Trader</title>
+  <meta name="description" content="Retrieval-augmented temporal modeling for risk-aware ETF allocation." />
+  <style>
+    :root{
+      --bg:#f8f7f3; --paper:#ffffff; --ink:#17202a; --muted:#677386; --line:#e6e0d7;
+      --blue:#3157d5; --teal:#0b9f88; --orange:#f59f00; --red:#d9480f; --green:#138a63;
+      --soft-blue:#eef2ff; --soft-green:#edf9f4; --soft-orange:#fff6df; --shadow:0 18px 56px rgba(23,32,42,.10);
+      --radius:24px; --max:1160px;
+    }
+    *{box-sizing:border-box} html{scroll-behavior:smooth} body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;line-height:1.58}
+    a{color:var(--blue);text-decoration:none} a:hover{text-decoration:underline}.wrap{width:min(var(--max),calc(100% - 42px));margin:0 auto}.wide{width:min(1360px,calc(100% - 42px));margin:0 auto}.muted{color:var(--muted)}
+    header{position:relative;overflow:hidden;min-height:94vh;display:grid;align-items:center;border-bottom:1px solid var(--line);background:radial-gradient(circle at 8% 18%,rgba(49,87,213,.22),transparent 32%),radial-gradient(circle at 88% 18%,rgba(11,159,136,.18),transparent 30%),linear-gradient(135deg,#fff 0%,#f7f0dd 43%,#edf3ff 100%)}
+    header:before{content:"";position:absolute;inset:0;background-image:linear-gradient(rgba(23,32,42,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(23,32,42,.035) 1px,transparent 1px);background-size:44px 44px;mask-image:linear-gradient(to bottom,black,transparent 78%)}
+    .hero{position:relative;padding:70px 0}.eyebrow{display:inline-flex;align-items:center;gap:9px;border:1px solid rgba(49,87,213,.22);background:rgba(255,255,255,.70);padding:8px 13px;border-radius:999px;color:#31439e;font-weight:850;font-size:13px;letter-spacing:.02em}.dot{width:8px;height:8px;border-radius:50%;background:var(--teal);box-shadow:0 0 0 7px rgba(11,159,136,.12)}
+    h1{font-size:clamp(44px,7.6vw,92px);line-height:.93;letter-spacing:-.06em;margin:22px 0 18px}.subtitle{max-width:920px;font-size:clamp(19px,2.2vw,26px);line-height:1.35;color:#30394a;margin:0}.buttons{display:flex;flex-wrap:wrap;gap:12px;margin-top:28px}.btn{display:inline-flex;align-items:center;gap:8px;padding:12px 16px;border-radius:999px;background:#fff;border:1px solid rgba(23,32,42,.10);font-weight:800;box-shadow:0 10px 24px rgba(23,32,42,.08)}.btn.primary{background:var(--ink);color:#fff;border-color:var(--ink)}
+    .hero-grid{display:grid;grid-template-columns:1.12fr .88fr;gap:22px;margin-top:44px}.glass{border-radius:var(--radius);border:1px solid rgba(23,32,42,.10);background:rgba(255,255,255,.76);box-shadow:var(--shadow);backdrop-filter:blur(10px);padding:24px}.glass h3{margin:0 0 10px;text-transform:uppercase;letter-spacing:.09em;color:var(--muted);font-size:13px}.glass p{margin:0;color:#344052}.metric-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:18px}.mini{border-radius:18px;background:#fff;border:1px solid var(--line);padding:16px}.mini b{display:block;font-size:26px;line-height:1;color:var(--ink);letter-spacing:-.04em}.mini span{display:block;margin-top:6px;color:var(--muted);font-size:13px;font-weight:700}
+    nav{position:sticky;top:0;z-index:30;background:rgba(248,247,243,.86);backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}nav .wrap{min-height:50px;display:flex;justify-content:center;gap:20px;overflow:auto}nav a{display:flex;align-items:center;color:#465166;font-weight:850;font-size:14px;white-space:nowrap}
+    section{padding:72px 0;border-bottom:1px solid var(--line)}.kicker{text-transform:uppercase;letter-spacing:.11em;color:var(--blue);font-size:13px;font-weight:900;margin-bottom:11px}h2{font-size:clamp(29px,4vw,50px);line-height:1.06;letter-spacing:-.04em;margin:0 0 18px}.lead{font-size:19px;max-width:920px;color:var(--muted);margin:0 0 28px}.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}.grid2{display:grid;grid-template-columns:repeat(2,1fr);gap:22px}.card{background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);padding:22px;box-shadow:0 12px 36px rgba(23,32,42,.055)}.card h3{margin:0 0 9px;font-size:18px}.card p{margin:0;color:var(--muted)}.tag{display:inline-flex;border-radius:999px;padding:6px 10px;background:var(--soft-blue);color:#3040a0;font-size:12px;font-weight:850;margin-bottom:10px}.note{border-left:5px solid var(--blue);background:#f7f8ff;border-radius:0 18px 18px 0;padding:17px 19px;color:#424e61;margin:24px 0}.warning{border-left-color:var(--orange);background:var(--soft-orange)}.success{border-left-color:var(--teal);background:var(--soft-green)}
+    .pipeline{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-top:28px}.step{position:relative;background:#fff;border:1px solid var(--line);border-radius:18px;padding:18px;min-height:160px}.step .num{width:32px;height:32px;border-radius:50%;display:grid;place-items:center;background:var(--soft-blue);color:var(--blue);font-weight:900;margin-bottom:12px}.step b{display:block;margin-bottom:7px}.step span{color:var(--muted);font-size:14px}.arrow{position:absolute;right:-13px;top:60px;color:#abb2bd;font-size:24px;font-weight:900;z-index:2}.formula{background:#121826;color:#edf2ff;border-radius:22px;padding:22px;margin:22px 0;font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;overflow:auto}.formula .comment{color:#9fb0d4}.formula strong{color:#fff}
+    .figure-grid{display:grid;grid-template-columns:1fr 1fr;gap:22px;margin-top:28px}.figure{background:#fff;border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;box-shadow:0 12px 36px rgba(23,32,42,.06)}.figure.full{grid-column:1/-1}.figure img{display:block;width:100%;height:auto;background:white}.figcap{padding:15px 18px;border-top:1px solid var(--line);color:var(--muted);font-size:14px}.figcap b{color:#283244}
+    .table-wrap{overflow:auto;background:#fff;border:1px solid var(--line);border-radius:var(--radius);box-shadow:0 12px 36px rgba(23,32,42,.06)}table{border-collapse:collapse;width:100%;font-size:14px;min-width:960px}th,td{padding:12px 13px;border-bottom:1px solid var(--line);text-align:right;white-space:nowrap}th:first-child,td:first-child{text-align:left}thead th{background:#f5f6fb;color:#435168;position:sticky;top:0}.main-row{background:#edf9f4;font-weight:900}.lowlight{background:#fff7e6}.refs li{margin-bottom:8px}.footer{padding:42px 0;color:var(--muted);font-size:14px}
+    @media (max-width:940px){.hero-grid,.metric-row,.grid3,.grid2,.pipeline,.figure-grid{grid-template-columns:1fr}.arrow{display:none}section{padding:54px 0}nav .wrap{justify-content:flex-start}.hero{padding:52px 0}header{min-height:auto}}
+  </style>
+</head>
+<body>
+<header id="top">
+  <div class="wrap hero">
+    <div class="eyebrow"><span class="dot"></span> Data-driven Learning Term Project · Investment ML</div>
+    <h1>Market-Memory<br/>Mamba-RAG Trader</h1>
+    <p class="subtitle">A retrieval-augmented temporal model for ETF allocation: learn a market-state embedding from multi-asset sequences, search historical analogues, and invest through a risk-aware core-satellite portfolio.</p>
+    <div class="buttons">
+      <a class="btn primary" href="#method">See Method</a>
+      <a class="btn" href="#results">View Results</a>
+      <a class="btn" href="report_overleaf.tex">Overleaf .tex</a>
+      <a class="btn" href="report_overleaf.pdf">PDF Report</a>
+      <a class="btn" href="assets/data/metrics_clean.csv">Metrics CSV</a>
+    </div>
+    <div class="hero-grid">
+      <div class="glass">
+        <h3>Project in one sentence</h3>
+        <p>Raw retrieval was interpretable but too conservative. We upgrade it by using a temporal neural encoder to form a learned market memory, then use retrieval as an audit layer before allocating capital.</p>
+      </div>
+      <div class="glass">
+        <h3>Main empirical takeaway</h3>
+        <p>The proposed strategy improved over the neural forecast alone and traded less than retrieval-only variants, but it did not beat simple passive ETF baselines in this bullish test period.</p>
+        <div class="metric-row">
+          <div class="mini"><b>1.173</b><span>Final equity</span></div>
+          <div class="mini"><b>0.374</b><span>Sharpe</span></div>
+          <div class="mini"><b>-20.2%</b><span>Max drawdown</span></div>
+          <div class="mini"><b>14.7</b><span>Ann. turnover</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+<nav><div class="wrap"><a href="#motivation">Motivation</a><a href="#rationale">Why Mamba-RAG?</a><a href="#method">Method</a><a href="#data">Data</a><a href="#results">Results</a><a href="#diagnostics">Diagnostics</a><a href="#limits">Limits</a></div></nav>
+<main>
+<section id="motivation">
+  <div class="wrap">
+    <div class="kicker">Motivation</div>
+    <h2>Financial forecasting is weak. The question is whether a trade can be justified.</h2>
+    <p class="lead">The original Market-Memory RAG compared a 60-day SPY pattern to raw historical windows. It reduced risk by abstaining, but it almost disappeared from the market and missed the upside. The upgraded version asks a more mature question: can a neural forecast be supported by similar learned market states?</p>
+    <div class="grid3">
+      <div class="card"><span class="tag">Problem</span><h3>Raw windows are not regimes</h3><p>A short price window may look similar while macro context, cross-asset behavior, and risk conditions differ.</p></div>
+      <div class="card"><span class="tag">Upgrade</span><h3>Learn the state first</h3><p>A temporal encoder observes 120-day multi-asset features and maps the market into an embedding before retrieval.</p></div>
+      <div class="card"><span class="tag">Portfolio</span><h3>Avoid all-or-nothing trading</h3><p>A core-satellite rule keeps baseline exposure while using AI signals only as tactical tilts.</p></div>
+    </div>
+    <div class="note"><b>Research question.</b> Can a sequence model plus retrieval memory produce an auditable ETF allocation that is more useful than neural forecasting or historical analogue search alone?</div>
+  </div>
+</section>
+<section id="rationale">
+  <div class="wrap">
+    <div class="kicker">Model rationale</div>
+    <h2>Why use a Mamba-style encoder and retrieval memory?</h2>
+    <p class="lead">The neural network is not added only to look fancy. It has a specific role: compress long, multivariate market history into a state vector where retrieval can compare regimes rather than raw prices.</p>
+    <div class="grid3">
+      <div class="card"><span class="tag">Mamba-style temporal model</span><h3>Long sequence memory</h3><p>Mamba-style selective state-space models are designed for efficient sequence modeling with input-dependent propagation and forgetting. That matches the project need: keep relevant trend/risk context and ignore stale noise.</p></div>
+      <div class="card"><span class="tag">TSMixer fallback</span><h3>Efficient multivariate baseline</h3><p>When official Mamba kernels are unavailable, a TSMixer-style PyTorch encoder is a defensible fallback because it explicitly mixes information across time and features for multivariate forecasting.</p></div>
+      <div class="card"><span class="tag">Retrieval augmentation</span><h3>Historical analogue audit</h3><p>Retrieval-augmented time-series work argues that historical pattern retrieval can provide inductive bias and complement a learned model. Here, retrieval checks whether similar past embeddings support the forecast.</p></div>
+    </div>
+    <div class="note warning"><b>Honest implementation note.</b> If the submitted run used the TSMixer fallback rather than official Mamba kernels, the result should be described as <b>Mamba-style temporal retrieval</b>, not as a benchmark of the official Mamba architecture.</div>
+  </div>
+</section>
+<section id="method">
+  <div class="wrap">
+    <div class="kicker">Method</div>
+    <h2>A five-stage pipeline: sequence, forecast, retrieve, agree, allocate.</h2>
+    <div class="pipeline">
+      <div class="step"><div class="num">1</div><b>ETF panel</b><span>Daily prices and features from broad ETFs: equities, bonds, gold, and sectors.</span><div class="arrow">→</div></div>
+      <div class="step"><div class="num">2</div><b>120-day sequence</b><span>Returns, volatility, moving-average gaps, drawdowns, and cross-asset context.</span><div class="arrow">→</div></div>
+      <div class="step"><div class="num">3</div><b>Temporal encoder</b><span>Outputs ETF return forecasts and a compact market-state embedding.</span><div class="arrow">→</div></div>
+      <div class="step"><div class="num">4</div><b>Memory retrieval</b><span>Finds nearest historical embeddings and summarizes what happened next.</span><div class="arrow">→</div></div>
+      <div class="step"><div class="num">5</div><b>Core-satellite</b><span>Invests through a stable core plus tactical tilts when model and retrieval agree.</span></div>
+    </div>
+    <div class="formula"><strong>Prediction and embedding</strong><br/>
+      (ŷ<sub>t</sub>, z<sub>t</sub>) = f<sub>θ</sub>(X<sub>t-119:t</sub>)<br/><br/>
+      <strong>Market memory retrieval</strong><br/>
+      N<sub>k</sub>(t) = TopK<sub>i∈past</sub> sim(z<sub>t</sub>, z<sub>i</sub>)<br/><br/>
+      <strong>Core-satellite allocation</strong><br/>
+      w<sub>t</sub> = (1 - ρ) w<sub>core</sub> + ρ w<sub>satellite,t</sub><br/>
+      <span class="comment">The core prevents the old RAG problem of vanishing into cash; the satellite gives the learned model room to act.</span>
+    </div>
+  </div>
+</section>
+<section id="data">
+  <div class="wrap">
+    <div class="kicker">Data and evaluation</div>
+    <h2>Broad ETF universe, chronological split, transaction-cost backtest.</h2>
+    <p class="lead">The final system moves beyond a single SPY window. It uses broad daily ETF data and evaluates only on the final chronological test split.</p>
+    <div class="grid3">
+      <div class="card"><h3>Universe</h3><p>SPY, QQQ, IWM, TLT, IEF, SHY, GLD, XLK, XLF, XLE, XLU, XLV, XLY, XLP.</p></div>
+      <div class="card"><h3>Prediction target</h3><p>Five-trading-day forward ETF log returns, used both for neural forecasts and retrieval outcome summaries.</p></div>
+      <div class="card"><h3>Leakage control</h3><p>Scaler, encoder training, and retrieval memory are fitted on past splits only; test rows retrieve only past market states.</p></div>
+    </div>
+  </div>
+</section>
+<section id="results">
+  <div class="wide">
+    <div class="kicker">Results</div>
+    <h2>Good story, modest alpha: the model helps, but passive baselines still win.</h2>
+    <p class="lead">The proposed strategy is not presented as a market-beating system. Its strongest evidence is component-level: it improves over Mamba-only, reduces turnover versus retrieval-only variants, and provides an auditable decision trail.</p>
+    <div class="grid3">
+      <div class="card"><span class="tag">Best final equity</span><div class="metric-row" style="display:block"><div class="mini"><b>1.640</b><span>Buy-hold SPY</span></div></div><p style="margin-top:12px">The test period rewarded market exposure.</p></div>
+      <div class="card"><span class="tag">Proposed method</span><div class="metric-row" style="display:block"><div class="mini"><b>1.173</b><span>Mamba-RAG core-satellite</span></div></div><p style="margin-top:12px">Better than Mamba-only, but not better than passive ETF baselines.</p></div>
+      <div class="card"><span class="tag">Turnover control</span><div class="metric-row" style="display:block"><div class="mini"><b>14.7</b><span>Annualized turnover</span></div></div><p style="margin-top:12px">Lower than raw KNN and embedding retrieval-only strategies.</p></div>
+    </div>
+    <div class="table-wrap" style="margin-top:24px">
+      <table>
+        <thead><tr><th>Strategy</th><th>Final</th><th>Total Ret.</th><th>CAGR</th><th>Vol.</th><th>Sharpe</th><th>Max DD</th><th>Ann. Turnover</th><th>Trades</th><th>Exposure</th></tr></thead>
+        <tbody>
+          <tr><td>buy_hold_spy</td><td>1.640</td><td>0.640</td><td>0.119</td><td>0.176</td><td>0.638</td><td>-0.243</td><td>0.000</td><td>0</td><td>1.000</td></tr>
+          <tr><td>equal_weight_all</td><td>1.399</td><td>0.399</td><td>0.079</td><td>0.121</td><td>0.629</td><td>-0.177</td><td>0.000</td><td>0</td><td>0.929</td></tr>
+          <tr><td>raw_knn_retrieval_only</td><td>1.361</td><td>0.361</td><td>0.072</td><td>0.115</td><td>0.607</td><td>-0.143</td><td>50.378</td><td>206</td><td>0.815</td></tr>
+          <tr class="main-row"><td>mamba_rag_core_satellite</td><td>1.173</td><td>0.173</td><td>0.037</td><td>0.097</td><td>0.374</td><td>-0.202</td><td>14.703</td><td>159</td><td>0.863</td></tr>
+          <tr><td>embedding_retrieval_only</td><td>1.208</td><td>0.208</td><td>0.043</td><td>0.146</td><td>0.345</td><td>-0.277</td><td>22.545</td><td>583</td><td>0.947</td></tr>
+          <tr><td>60_40_spy_tlt</td><td>1.159</td><td>0.159</td><td>0.034</td><td>0.129</td><td>0.259</td><td>-0.269</td><td>0.000</td><td>0</td><td>1.000</td></tr>
+          <tr><td>momentum_rotation</td><td>1.172</td><td>0.172</td><td>0.037</td><td>0.156</td><td>0.230</td><td>-0.252</td><td>23.161</td><td>206</td><td>0.998</td></tr>
+          <tr><td>mamba_only</td><td>1.131</td><td>0.131</td><td>0.028</td><td>0.129</td><td>0.216</td><td>-0.268</td><td>8.889</td><td>206</td><td>0.984</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="figure-grid">
+      <div class="figure full"><img src="assets/figures/metrics_table.png" alt="Metrics table figure"><div class="figcap"><b>Metrics table.</b> The screenshot table is kept for presentation use; the typed table above is the easier-to-read version for the project page.</div></div>
+    </div>
+  </div>
+</section>
+<section id="diagnostics">
+  <div class="wide">
+    <div class="kicker">Diagnostics</div>
+    <h2>The value of the method is auditability: we can inspect agreement, memory, and allocation.</h2>
+    <div class="figure-grid">
+      <div class="figure"><img src="assets/figures/model_vs_retrieval_scores.png" alt="Model versus retrieval scores"><div class="figcap"><b>Model vs retrieval.</b> The positive-positive quadrant is where neural forecast and retrieved historical outcomes agree. This is the signal-auditing layer.</div></div>
+      <div class="figure"><img src="assets/figures/coverage_performance.png" alt="Coverage versus agreement threshold"><div class="figcap"><b>Agreement threshold.</b> Increasing agreement makes the satellite more selective. This generalizes the original “when not to trade” idea.</div></div>
+      <div class="figure full"><img src="assets/figures/allocation_heatmap.png" alt="Allocation heatmap"><div class="figcap"><b>Allocation heatmap.</b> The strategy maintains a stable core while tilting across bonds, gold, equities, and sectors.</div></div>
+      <div class="figure"><img src="assets/figures/signal_agreement.png" alt="Signal agreement over time"><div class="figcap"><b>Signal agreement over time.</b> Agreement varies by regime, which supports treating retrieval as a conditional audit layer rather than an always-on predictor.</div></div>
+      <div class="figure"><img src="assets/figures/embedding_pca.png" alt="Embedding PCA"><div class="figcap"><b>Embedding space.</b> PCA gives a sanity check that the encoder organizes market states into structured trajectories.</div></div>
+      <div class="figure"><img src="assets/figures/turnover_comparison.png" alt="Turnover comparison"><div class="figcap"><b>Turnover.</b> The final core-satellite design trades less than raw KNN and embedding retrieval-only variants.</div></div>
+      <div class="figure"><img src="assets/figures/rolling_sharpe.png" alt="Rolling Sharpe"><div class="figcap"><b>Rolling Sharpe.</b> No strategy dominates every regime, motivating the use of risk-aware allocation rather than pure return chasing.</div></div>
+    </div>
+  </div>
+</section>
+<section id="limits">
+  <div class="wrap">
+    <div class="kicker">Limitations and next experiments</div>
+    <h2>The current evidence is enough for a coherent project, but not enough for a strong alpha claim.</h2>
+    <p class="lead">The honest conclusion is that Mamba-RAG is a useful auditable allocation framework, not a proven trading edge. The next experiments below would make the evidence much stronger if time remains.</p>
+    <div class="grid3">
+      <div class="card"><h3>Seed robustness</h3><p>Run 3-5 seeds and report mean/std for Mamba-only, embedding retrieval-only, and Mamba-RAG core-satellite.</p></div>
+      <div class="card"><h3>Lookback ablation</h3><p>Compare 60, 120, and 252-day windows to directly answer whether 60 days was too short.</p></div>
+      <div class="card"><h3>Component ablation</h3><p>Compare no retrieval, raw KNN retrieval, learned embedding retrieval, and core-satellite allocation under the same cost model.</p></div>
+    </div>
+    <div class="note success"><b>Final claim to make.</b> The project demonstrates a structured way to combine modern temporal modeling with retrieval-based market memory. It improves interpretability and component behavior, but simple passive baselines remain hard to beat.</div>
+  </div>
+</section>
+<section id="references">
+  <div class="wrap">
+    <div class="kicker">References</div>
+    <h2>Why this structure is technically defensible.</h2>
+    <ul class="refs">
+      <li><b>Mamba.</b> Gu and Dao, <i>Mamba: Linear-Time Sequence Modeling with Selective State Spaces</i>, 2023.</li>
+      <li><b>TSMixer.</b> Chen et al., <i>TSMixer: An All-MLP Architecture for Time Series Forecasting</i>, 2023.</li>
+      <li><b>Retrieval-augmented forecasting.</b> Han et al., <i>Retrieval Augmented Time Series Forecasting</i>, 2025.</li>
+    </ul>
+  </div>
+</section>
+</main>
+<footer class="footer"><div class="wrap">Historical backtest only. Not investment advice. Run <code>python run.py --mode full</code> in the project root to regenerate metrics and figures.</div></footer>
+</body>
+</html>
