@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Market-Memory Mamba-RAG Trader</title>
+  <meta name="description" content="A concise project page for a retrieval-augmented temporal ETF allocation model." />
+  <style>
+    :root{
+      --bg:#fbfaf7; --paper:#ffffff; --ink:#17202a; --muted:#657084; --line:#e7e0d5;
+      --blue:#2f56d7; --teal:#0f9f8f; --orange:#f59f00; --red:#df4a30;
+      --soft-blue:#eef2ff; --soft-teal:#eaf8f5; --soft-orange:#fff6df;
+      --shadow:0 18px 48px rgba(23,32,42,.08); --radius:24px; --max:1120px;
+    }
+    *{box-sizing:border-box} html{scroll-behavior:smooth}
+    body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;line-height:1.55}
+    a{color:var(--blue);text-decoration:none} a:hover{text-decoration:underline}
+    .wrap{width:min(var(--max),calc(100% - 44px));margin:0 auto}.wide{width:min(1320px,calc(100% - 44px));margin:0 auto}.muted{color:var(--muted)}
+    header{min-height:86vh;display:grid;align-items:center;position:relative;overflow:hidden;border-bottom:1px solid var(--line);background:radial-gradient(circle at 15% 18%,rgba(47,86,215,.18),transparent 32%),radial-gradient(circle at 90% 22%,rgba(15,159,143,.18),transparent 32%),linear-gradient(135deg,#fff 0%,#f8eedc 48%,#eef4ff 100%)}
+    header:before{content:"";position:absolute;inset:0;background-image:linear-gradient(rgba(23,32,42,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(23,32,42,.035) 1px,transparent 1px);background-size:42px 42px;mask-image:linear-gradient(to bottom,black,transparent 78%)}
+    .hero{position:relative;padding:74px 0 60px}.label{display:inline-flex;align-items:center;gap:8px;color:#3954a6;font-size:13px;font-weight:850;letter-spacing:.03em;text-transform:uppercase}.dot{width:9px;height:9px;border-radius:50%;background:var(--teal);box-shadow:0 0 0 7px rgba(15,159,143,.12)}
+    h1{font-size:clamp(46px,7.5vw,92px);line-height:.94;letter-spacing:-.06em;margin:18px 0 18px}.subtitle{max-width:920px;font-size:clamp(19px,2.1vw,27px);line-height:1.34;color:#30394a;margin:0}.buttons{display:flex;flex-wrap:wrap;gap:12px;margin-top:30px}.btn{display:inline-flex;align-items:center;padding:12px 17px;border-radius:999px;background:#fff;border:1px solid rgba(23,32,42,.10);font-weight:850;box-shadow:0 10px 24px rgba(23,32,42,.075)}.btn.primary{background:var(--ink);color:#fff;border-color:var(--ink)}
+    .hero-cards{display:grid;grid-template-columns:1.1fr .9fr;gap:20px;margin-top:42px}.glass{border-radius:var(--radius);background:rgba(255,255,255,.76);border:1px solid rgba(23,32,42,.10);box-shadow:var(--shadow);backdrop-filter:blur(10px);padding:24px}.glass h3,.card h3{margin:0 0 9px}.glass p,.card p{margin:0;color:#465166}.metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:18px}.mini{background:#fff;border:1px solid var(--line);border-radius:17px;padding:14px}.mini b{display:block;font-size:25px;line-height:1;letter-spacing:-.04em}.mini span{display:block;margin-top:6px;color:var(--muted);font-size:12px;font-weight:800}
+    nav{position:sticky;top:0;z-index:30;background:rgba(251,250,247,.88);backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}nav .wrap{min-height:52px;display:flex;justify-content:center;gap:24px;overflow:auto}nav a{display:flex;align-items:center;color:#465166;font-weight:850;font-size:14px;white-space:nowrap}
+    section{padding:68px 0;border-bottom:1px solid var(--line)}.kicker{text-transform:uppercase;letter-spacing:.12em;color:var(--blue);font-size:13px;font-weight:900;margin-bottom:10px}h2{font-size:clamp(30px,4.2vw,50px);line-height:1.08;letter-spacing:-.04em;margin:0 0 16px}.lead{font-size:18px;max-width:900px;color:var(--muted);margin:0 0 24px}.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}.grid2{display:grid;grid-template-columns:repeat(2,1fr);gap:22px}.card{background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);padding:22px;box-shadow:0 12px 32px rgba(23,32,42,.05)}.tag{display:inline-flex;border-radius:999px;padding:6px 10px;background:var(--soft-blue);color:#3040a0;font-size:12px;font-weight:900;margin-bottom:10px}.tag.teal{background:var(--soft-teal);color:#087867}.tag.orange{background:var(--soft-orange);color:#9b5f00}
+    .figure-grid{display:grid;grid-template-columns:1fr 1fr;gap:22px;margin-top:26px}.figure{background:#fff;border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;box-shadow:0 12px 36px rgba(23,32,42,.06)}.figure.full{grid-column:1/-1}.figure img{display:block;width:100%;height:auto;background:#fff}.figcap{padding:14px 17px;border-top:1px solid var(--line);color:var(--muted);font-size:14px}.figcap b{color:#283244}
+    .table-wrap{overflow:auto;background:#fff;border:1px solid var(--line);border-radius:var(--radius);box-shadow:0 12px 32px rgba(23,32,42,.055);margin-top:20px}table{width:100%;border-collapse:collapse;font-size:14px;min-width:840px}th,td{padding:12px 13px;border-bottom:1px solid var(--line);text-align:right;white-space:nowrap}th:first-child,td:first-child{text-align:left}thead th{background:#f5f6fb;color:#435168}.main-row{background:#edf9f4;font-weight:900}.warn-row{background:#fff8e8}.callout{border-left:5px solid var(--teal);background:var(--soft-teal);padding:16px 18px;border-radius:0 18px 18px 0;color:#344052;margin-top:22px}.footer{padding:40px 0;color:var(--muted);font-size:14px}
+    @media (max-width:920px){.hero-cards,.metrics,.grid3,.grid2,.figure-grid{grid-template-columns:1fr}section{padding:52px 0}nav .wrap{justify-content:flex-start}.hero{padding:58px 0}header{min-height:auto}}
+  </style>
+</head>
+<body>
+<header id="top">
+  <div class="wrap hero">
+    <div class="label"><span class="dot"></span> Investment ML term project</div>
+    <h1>Market-Memory<br/>Mamba-RAG Trader</h1>
+    <p class="subtitle">A temporal ETF allocation model that learns market-state embeddings, retrieves similar historical regimes, and invests through a risk-aware core-satellite portfolio.</p>
+    <div class="buttons">
+      <a class="btn primary" href="#method">See Method</a>
+      <a class="btn" href="#results">View Results</a>
+      <a class="btn" href="report_overleaf.pdf">PDF Report</a>
+    </div>
+    <div class="hero-cards">
+      <div class="glass">
+        <h3>What changed from the first RAG version?</h3>
+        <p>The first version matched raw 60-day SPY windows and often stayed out of the market. This version uses a neural temporal encoder, wider ETF data, learned retrieval, and a core-satellite allocation rule.</p>
+      </div>
+      <div class="glass">
+        <h3>Final takeaway</h3>
+        <p>Mamba-RAG did not beat passive ETF baselines, but it improved over Mamba-only and made the trading signal auditable through historical analogues.</p>
+        <div class="metrics">
+          <div class="mini"><b>1.173</b><span>Final equity</span></div>
+          <div class="mini"><b>0.374</b><span>Sharpe</span></div>
+          <div class="mini"><b>-20.2%</b><span>Max DD</span></div>
+          <div class="mini"><b>14.7</b><span>Ann. turnover</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+<nav><div class="wrap"><a href="#motivation">Motivation</a><a href="#method">Method</a><a href="#results">Results</a><a href="#ablation">Ablation</a><a href="#diagnostics">Diagnostics</a><a href="#limits">Limits</a></div></nav>
+<main>
+<section id="motivation">
+  <div class="wrap">
+    <div class="kicker">Motivation</div>
+    <h2>In finance, the hard part is not only forecasting. It is deciding whether a forecast is trustworthy.</h2>
+    <p class="lead">Raw retrieval is interpretable, but a short price pattern is not a full market state. We therefore combine a temporal neural encoder with retrieval: the model predicts, and historical analogues audit that prediction before capital is allocated.</p>
+    <div class="grid3">
+      <div class="card"><span class="tag">Neural memory</span><h3>Longer context</h3><p>Use 120-day multi-asset features instead of only a short SPY pattern.</p></div>
+      <div class="card"><span class="tag teal">Retrieval audit</span><h3>Historical analogues</h3><p>Trade more confidently when model forecasts and retrieved futures agree.</p></div>
+      <div class="card"><span class="tag orange">Portfolio rule</span><h3>Core-satellite</h3><p>Keep a stable defensive core and use model/retrieval signals as tactical tilts.</p></div>
+    </div>
+  </div>
+</section>
+<section id="method">
+  <div class="wrap">
+    <div class="kicker">Method</div>
+    <h2>Pipeline: encode the market, retrieve similar past states, allocate with risk control.</h2>
+    <div class="figure full" style="margin-top:24px"><img src="assets/figures/method_pipeline_clean.png" alt="Method pipeline"><div class="figcap"><b>Method overview.</b> The encoder produces both return forecasts and embeddings. Retrieval checks whether similar past embeddings led to consistent ETF outcomes.</div></div>
+    <div class="grid3" style="margin-top:22px">
+      <div class="card"><h3>Data</h3><p>Daily ETF panel: SPY, QQQ, IWM, TLT, IEF, SHY, GLD, and major sector ETFs.</p></div>
+      <div class="card"><h3>Model</h3><p>Mamba-style temporal encoder with a TSMixer fallback when official Mamba kernels are unavailable.</p></div>
+      <div class="card"><h3>Decision</h3><p>Combine model score, retrieved neighbor outcomes, and agreement into ETF allocation weights.</p></div>
+    </div>
+  </div>
+</section>
+<section id="results">
+  <div class="wide">
+    <div class="kicker">Results</div>
+    <h2>Passive exposure won this test, but Mamba-RAG improved the neural signal.</h2>
+    <p class="lead">We should not claim market-beating alpha. The clean claim is component-level: retrieval improves over Mamba-only, and the core-satellite layer turns the signal into a more controlled portfolio.</p>
+    <div class="grid3">
+      <div class="card"><span class="tag">Best baseline</span><h3>Buy-hold SPY: 1.640</h3><p>The test period rewarded continuous equity exposure.</p></div>
+      <div class="card"><span class="tag teal">Proposed</span><h3>Mamba-RAG: 1.173</h3><p>Higher than Mamba-only, lower than passive ETF baselines.</p></div>
+      <div class="card"><span class="tag orange">Tradeoff</span><h3>Turnover: 14.7</h3><p>Less aggressive than retrieval-only variants.</p></div>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Strategy</th><th>Final</th><th>CAGR</th><th>Sharpe</th><th>Max DD</th><th>Ann. Turnover</th><th>Short interpretation</th></tr></thead>
+        <tbody>
+          <tr><td>buy_hold_spy</td><td>1.640</td><td>0.119</td><td>0.638</td><td>-0.243</td><td>0.0</td><td>best final equity</td></tr>
+          <tr><td>equal_weight_all</td><td>1.399</td><td>0.079</td><td>0.629</td><td>-0.177</td><td>0.0</td><td>strong diversified baseline</td></tr>
+          <tr class="warn-row"><td>raw_knn_retrieval_only</td><td>1.361</td><td>0.072</td><td>0.607</td><td>-0.145</td><td>50.3</td><td>strong but overactive</td></tr>
+          <tr><td>embedding_retrieval_only</td><td>1.248</td><td>-</td><td>0.345</td><td>-0.277</td><td>22.5</td><td>learned memory only</td></tr>
+          <tr class="main-row"><td>mamba_rag_core_satellite</td><td>1.173</td><td>0.037</td><td>0.374</td><td>-0.202</td><td>14.7</td><td>balanced proposed method</td></tr>
+          <tr><td>mamba_only</td><td>1.131</td><td>0.028</td><td>0.216</td><td>-0.268</td><td>8.9</td><td>no retrieval</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="figure-grid">
+      <div class="figure full"><img src="assets/figures/result_snapshot.png" alt="Result snapshot"><div class="figcap"><b>Result snapshot.</b> Passive baselines remain difficult to beat; the proposed strategy's main win is over Mamba-only.</div></div>
+    </div>
+  </div>
+</section>
+<section id="ablation">
+  <div class="wide">
+    <div class="kicker">Component ablation</div>
+    <h2>Retrieval helps, but the construction rule decides how usable the signal is.</h2>
+    <p class="lead">All four variants below use the same test split and the same 5 bps L1 turnover cost. The ablation supports a nuanced claim: raw KNN is the strongest standalone signal here, but the final core-satellite design is more controlled and auditable.</p>
+    <div class="figure full"><img src="assets/figures/component_ablation_clean.png" alt="Component ablation"><div class="figcap"><b>Ablation summary.</b> Retrieval improves over no retrieval. Core-satellite Mamba-RAG sacrifices some return for lower turnover and a more realistic portfolio structure.</div></div>
+    <div class="callout"><b>What this proves:</b> The RAG component is not decoration. It changes Sharpe and drawdown relative to Mamba-only. <b>What it does not prove:</b> It does not prove a robust live trading edge.</div>
+  </div>
+</section>
+<section id="diagnostics">
+  <div class="wide">
+    <div class="kicker">Diagnostics</div>
+    <h2>The model is inspectable: allocations, agreement, and embeddings can be checked.</h2>
+    <div class="figure-grid">
+      <div class="figure full"><img src="assets/figures/allocation_heatmap.png" alt="Allocation heatmap"><div class="figcap"><b>Allocation heatmap.</b> The portfolio keeps a core exposure while tilting across bonds, gold, broad equities, and sectors.</div></div>
+      <div class="figure"><img src="assets/figures/model_vs_retrieval_scores.png" alt="Model versus retrieval scores"><div class="figcap"><b>Model vs retrieval.</b> The top-right quadrant is where the model forecast and retrieved historical outcomes agree.</div></div>
+      <div class="figure"><img src="assets/figures/coverage_performance.png" alt="Coverage versus agreement threshold"><div class="figcap"><b>Agreement threshold.</b> Higher thresholds reduce coverage, showing how the RAG layer controls participation.</div></div>
+      <div class="figure"><img src="assets/figures/embedding_pca.png" alt="Embedding PCA"><div class="figcap"><b>Embedding PCA.</b> A sanity check that learned market states form structured trajectories.</div></div>
+      <div class="figure"><img src="assets/figures/signal_agreement.png" alt="Signal agreement"><div class="figcap"><b>Agreement over time.</b> Model-retrieval agreement changes by regime, motivating a selective satellite.</div></div>
+    </div>
+  </div>
+</section>
+<section id="limits">
+  <div class="wrap">
+    <div class="kicker">Limits</div>
+    <h2>Useful project, not investment advice.</h2>
+    <p class="lead">The evidence is a historical backtest with simplified costs. The final claim should be about design and auditability, not guaranteed alpha.</p>
+    <div class="grid3">
+      <div class="card"><h3>Not robust yet</h3><p>Seed robustness and walk-forward retraining should be added before making stronger claims.</p></div>
+      <div class="card"><h3>Lookback still matters</h3><p>60/120/252-day ablations would directly test how much memory is needed.</p></div>
+      <div class="card"><h3>Execution simplified</h3><p>Taxes, market impact, slippage regimes, and intraday execution are not modeled.</p></div>
+    </div>
+  </div>
+</section>
+</main>
+<footer class="footer"><div class="wrap">Historical backtest only. Not investment advice. Final package includes this page, an Overleaf-ready report, and the rendered PDF.</div></footer>
+</body>
+</html>
